@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>my cool website</title>
+    <link rel="stylesheet" href="https://unpkg.com/98.css">
+    <style>
+        body {
+            background: #008080;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .window {
+            margin-bottom: 20px;
+        }
+
+        .photo-placeholder {
+            width: 150px;
+            height: 150px;
+            background: #c0c0c0;
+            border: 1px solid #808080;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 16px;
+        }
+
+        .photo-placeholder img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-section {
+            display: flex;
+            align-items: flex-start;
+            padding: 16px;
+        }
+
+        .profile-info h2 {
+            margin: 0 0 8px 0;
+        }
+
+        .profile-info p {
+            margin: 4px 0;
+        }
+
+        .section-content {
+            padding: 16px;
+        }
+
+        .contact-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .contact-list li {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .contact-list li span {
+            min-width: 100px;
+            font-weight: bold;
+        }
+
+
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <!-- SECTION: Profile -->
+        <div class="window">
+            <div class="title-bar">
+                <div class="title-bar-text">Profile</div>
+                <div class="title-bar-controls">
+                    <button aria-label="Minimize"></button>
+                    <button aria-label="Maximize"></button>
+                    <button aria-label="Close"></button>
+                </div>
+            </div>
+            <div class="window-body">
+                <div class="profile-section">
+                    <div class="photo-placeholder">
+                        <!-- Replace with your photo -->
+                        <img src="photo.png" alt="Photo">
+                    </div>
+                    <div class="profile-info">
+                        <h2>Andrew Marzycielski</h2>
+                        <p>welcome to my COOL homepage</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION: About Me -->
+
+        <!-- SECTION: Contacts -->
+        <div class="window">
+            <div class="title-bar">
+                <div class="title-bar-text">Contacts</div>
+                <div class="title-bar-controls">
+                    <button aria-label="Minimize"></button>
+                    <button aria-label="Maximize"></button>
+                    <button aria-label="Close"></button>
+                </div>
+            </div>
+            <div class="window-body">
+                <div class="section-content">
+                    <ul class="contact-list">
+                        <li>
+                            <span>Telegram:</span>
+                            <a href="https://t.me/marzycielskii">@marzycielskii</a>
+                        </li>
+                        <li>
+                            <span>Discord:</span>
+                            <a href="marzycielskii">marzycielskii</a>
+                        </li>
+                        
+                        <li>
+                            <span>Letterboxd:</span>
+                            <a href="https://letterboxd.com/marzycielskii/">letterboxd.com</a>
+                        </li>
+                        <li>
+                            <span>Last.fm:</span>
+                            <a href="https://www.last.fm/user/megaosi1">megaosi1</a>
+                        </li>
+                        <li>
+                            <span>Twitter (X):</span>
+                            <a href="https://x.com/marzycielskii">@marzycielskii</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION: Telegram Channel -->
+        <div class="window">
+            <div class="title-bar">
+                <div class="title-bar-text">Telegram Channel</div>
+                <div class="title-bar-controls">
+                    <button aria-label="Minimize"></button>
+                    <button aria-label="Maximize"></button>
+                    <button aria-label="Close"></button>
+                </div>
+            </div>
+            <div class="window-body">
+                <div class="section-content">
+                    <ul class="contact-list">
+                        <li>
+                            <span>Channel:</span>
+                            <a href="https://t.me/smthinwicked">@smthinwicked</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>
