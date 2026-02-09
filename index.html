@@ -7,7 +7,8 @@
     <link rel="stylesheet" href="https://unpkg.com/98.css">
     <style>
         body {
-            background: #008080;
+            /* Background image - replace 'background.jpg' with your image */
+            background: #008080 url('background.jpg') center center / cover no-repeat fixed;
             min-height: 100vh;
             padding: 20px;
             display: flex;
@@ -26,9 +27,9 @@
 
         .photo-placeholder {
             width: 150px;
-            height: 150px;
+            height: 120px;
             background: #c0c0c0;
-            border: 1px solid #808080;
+            border: 0px solid #808080;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -76,7 +77,64 @@
             font-weight: bold;
         }
 
+        /* Now Playing Section */
+        .now-playing {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+        }
 
+        .album-art {
+            width: 64px;
+            height: 64px;
+            min-width: 64px;
+            background: #c0c0c0;
+            border: 1px solid #808080;
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .album-art img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .track-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .track-name {
+            font-weight: bold;
+            margin: 0 0 4px 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .artist-name {
+            margin: 0;
+            color: #444;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .status-badge {
+            font-size: 11px;
+            padding: 2px 6px;
+            background: #c0c0c0;
+            border: 1px solid #808080;
+            margin-left: 8px;
+        }
+
+        .status-badge.playing {
+            background: #90EE90;
+        }
     </style>
 </head>
 <body>
@@ -96,7 +154,7 @@
                 <div class="profile-section">
                     <div class="photo-placeholder">
                         <!-- Replace with your photo -->
-                        <img src="photo.png" alt="Photo">
+                        <img src="photo.jpg" alt="Photo">
                     </div>
                     <div class="profile-info">
                         <h2>Andrew Marzycielski</h2>
@@ -106,7 +164,29 @@
             </div>
         </div>
 
-        <!-- SECTION: About Me -->
+        <!-- SECTION: Now Playing (Last.fm) -->
+        <div class="window">
+            <div class="title-bar">
+                <div class="title-bar-text">Now Playing</div>
+                <div class="title-bar-controls">
+                    <button aria-label="Minimize"></button>
+                    <button aria-label="Maximize"></button>
+                    <button aria-label="Close"></button>
+                </div>
+            </div>
+            <div class="window-body">
+                <div class="now-playing">
+                    <div class="album-art">
+                        <img id="album-art" src="https://via.placeholder.com/64" alt="Album">
+                    </div>
+                    <div class="track-info">
+                        <p class="track-name" id="track-name">Loading...</p>
+                        <p class="artist-name" id="artist-name">Please wait</p>
+                    </div>
+                    <span class="status-badge" id="status-badge">...</span>
+                </div>
+            </div>
+        </div>
 
         <!-- SECTION: Contacts -->
         <div class="window">
@@ -170,5 +250,114 @@
         </div>
 
     </div>
+
+    <script>
+        // ============================================
+        // LAST.FM CONFIGURATION
+        // Get your API key at: https://www.last.fm/api/account/create
+        // ============================================
+        const LASTFM_API_KEY = '37be68fc420917638f299aaadf992188'; // <-- REPLACE WITH YOUR API KEY
+        const LASTFM_USERNAME = 'megaosi1';
+        const UPDATE_INTERVAL = 30000; // Update every 30 seconds
+        // ============================================
+
+        const trackNameEl = document.getElementById('track-name');
+        const artistNameEl = document.getElementById('artist-name');
+        const albumArtEl = document.getElementById('album-art');
+        const statusBadgeEl = document.getElementById('status-badge');
+
+        // Callback counter for JSONP
+        let callbackCounter = 0;
+
+        function fetchNowPlaying() {
+            // Using JSONP to bypass CORS
+            const callbackName = 'lastfmCallback' + (++callbackCounter);
+            const url = `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${LASTFM_USERNAME}&api_key=${LASTFM_API_KEY}&format=json&limit=1&callback=${callbackName}`;
+            
+            // Create script element for JSONP
+            const script = document.createElement('script');
+            script.src = url;
+            
+            // Define callback function
+            window[callbackName] = function(data) {
+                // Clean up
+                delete window[callbackName];
+                document.body.removeChild(script);
+                
+                // Process data
+                processLastFmData(data);
+            };
+            
+            // Handle errors
+            script.onerror = function() {
+                delete window[callbackName];
+                document.body.removeChild(script);
+                showError('Connection error');
+            };
+            
+            // Add script to page
+            document.body.appendChild(script);
+        }
+
+        function processLastFmData(data) {
+            if (data.error) {
+                showError('API Error: ' + data.message);
+                return;
+            }
+
+            const tracks = data.recenttracks?.track;
+            if (!tracks || tracks.length === 0) {
+                showNotPlaying();
+                return;
+            }
+
+            const track = Array.isArray(tracks) ? tracks[0] : tracks;
+            const isNowPlaying = track['@attr']?.nowplaying === 'true';
+
+            // Track name
+            trackNameEl.textContent = track.name || 'Unknown Track';
+            
+            // Artist name
+            const artistName = typeof track.artist === 'object' ? track.artist['#text'] : track.artist;
+            artistNameEl.textContent = artistName || 'Unknown Artist';
+
+            // Album art
+            const imageUrl = track.image?.[2]?.['#text'] || track.image?.[1]?.['#text'] || track.image?.[0]?.['#text'];
+            if (imageUrl && imageUrl !== '') {
+                albumArtEl.src = imageUrl;
+            } else {
+                albumArtEl.src = 'https://via.placeholder.com/64?text=♪';
+            }
+
+            // Status badge
+            if (isNowPlaying) {
+                statusBadgeEl.textContent = '▶ Playing';
+                statusBadgeEl.className = 'status-badge playing';
+            } else {
+                statusBadgeEl.textContent = 'Last played';
+                statusBadgeEl.className = 'status-badge';
+            }
+        }
+
+        function showError(message) {
+            trackNameEl.textContent = message;
+            artistNameEl.textContent = 'Check API key';
+            statusBadgeEl.textContent = 'Error';
+            statusBadgeEl.className = 'status-badge';
+        }
+
+        function showNotPlaying() {
+            trackNameEl.textContent = 'Nothing playing';
+            artistNameEl.textContent = 'No recent tracks';
+            statusBadgeEl.textContent = 'Offline';
+            statusBadgeEl.className = 'status-badge';
+        }
+
+        // Initial fetch
+        fetchNowPlaying();
+
+        // Auto-update
+        setInterval(fetchNowPlaying, UPDATE_INTERVAL);
+    </script>
 </body>
 </html>
